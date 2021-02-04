@@ -5,14 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 
 import com.playtomic.tests.wallet.entity.IllegalAmountException;
+import com.playtomic.tests.wallet.entity.MovementType;
 import com.playtomic.tests.wallet.entity.Wallet;
 import com.playtomic.tests.wallet.repository.WalletRepository;
 import com.playtomic.tests.wallet.service.WalletService;
@@ -42,12 +41,12 @@ public class WalletServiceIT {
 
     @Test(expected = IllegalAmountException.class)
     public void charge_biggerThanBalance_exception() {
-        walletService.charge(1L, BigDecimal.valueOf(10001));
+        walletService.move(1L, BigDecimal.valueOf(10001), MovementType.CHARGE);
     }
 
     @Test(expected = RechargeFailedException.class)
     public void recharge_smallerThanThreshold_exception() {
-        walletService.recharge(1L, BigDecimal.valueOf(9));
+        walletService.move(1L, BigDecimal.valueOf(9), MovementType.RECHARGE);
     }
 
     @Test
@@ -59,7 +58,7 @@ public class WalletServiceIT {
 
         for (int i = 1; i <= 100; i++) {
             charges = charges + i;
-            tasks.add(getCallable(1, walletService::charge, i));
+            tasks.add(getCallableCharge(1, i));
         }
 
         executor.invokeAll(tasks);
@@ -79,7 +78,7 @@ public class WalletServiceIT {
 
         for (int i = 10; i <= 30; i++) {
             recharges = recharges + i;
-            tasks.add(getCallable(1, walletService::recharge, i));
+            tasks.add(getCallableReCharge(1, i));
         }
 
         executor.invokeAll(tasks);
@@ -90,11 +89,12 @@ public class WalletServiceIT {
               .isEqualTo(BigDecimal.valueOf(10000).add(BigDecimal.valueOf(recharges)).setScale(2));
     }
 
-    private Callable<Wallet> getCallable(
-          long walletId,
-          BiFunction<Long, BigDecimal, Optional<Wallet>> method,
-          long amount) {
-        return () -> method.apply(walletId, BigDecimal.valueOf(amount)).get();
+    private Callable<Wallet> getCallableCharge(long walletId, long amount) {
+        return () -> walletService.move(walletId, BigDecimal.valueOf(amount), MovementType.CHARGE).get();
+    }
+
+    private Callable<Wallet> getCallableReCharge(long walletId, long amount) {
+        return () -> walletService.move(walletId, BigDecimal.valueOf(amount), MovementType.RECHARGE).get();
     }
 
 }

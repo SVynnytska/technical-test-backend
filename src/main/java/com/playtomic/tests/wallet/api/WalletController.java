@@ -6,7 +6,6 @@ import com.playtomic.tests.wallet.entity.Wallet;
 import com.playtomic.tests.wallet.service.WalletService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,19 +23,10 @@ public class WalletController {
 
     private final WalletService walletService;
 
-    @PostMapping("/{id}/recharges")
-    public ResponseEntity<Resource<Wallet>> recharge(@PathVariable @NonNull Long id,
-          @RequestBody @Valid PaymentRequest request) {
-        return walletService.recharge(id, request.getAmount())
-                            .map(this::toResource)
-                            .map(ResponseEntity::ok)
-                            .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/{id}/charges")
-    public ResponseEntity<Resource<Wallet>> charge(@PathVariable @NonNull Long id,
-          @RequestBody @Valid PaymentRequest request) {
-        return walletService.charge(id, request.getAmount())
+    @PostMapping("/{id}/movements")
+    public ResponseEntity<Resource<Wallet>> movements(@PathVariable @NonNull Long id,
+          @RequestBody @Valid MovementRequest request) {
+        return walletService.move(id, request.getAmount(), request.getType())
                             .map(this::toResource)
                             .map(ResponseEntity::ok)
                             .orElseGet(() -> ResponseEntity.notFound().build());

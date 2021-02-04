@@ -47,8 +47,8 @@ public class WalletControllerIT {
 
     @Test
     public void charge_200() throws Exception {
-        mvc.perform(post("/wallets/{id}/charges", "1")
-              .content("{\"amount\" : \"10\"}")
+        mvc.perform(post("/wallets/{id}/movements", "1")
+              .content("{\"amount\" : \"10\", \"type\" : \"CHARGE\"}")
               .contentType("application/json"))
            .andDo(print())
            .andExpect(status().isOk());
@@ -56,8 +56,8 @@ public class WalletControllerIT {
 
     @Test
     public void charge_biggerThanBalance_400() throws Exception {
-        mvc.perform(post("/wallets/{id}/charges", "1")
-              .content("{\"amount\" : \"111\"}")
+        mvc.perform(post("/wallets/{id}/movements", "1")
+              .content("{\"amount\" : \"111\", \"type\" : \"CHARGE\"}")
               .contentType("application/json"))
            .andDo(print())
            .andExpect(status().isBadRequest());
@@ -65,8 +65,8 @@ public class WalletControllerIT {
 
     @Test
     public void charge_negativeAmount_400() throws Exception {
-        mvc.perform(post("/wallets/{id}/charges", "1")
-              .content("{\"amount\" : \"-1\"}")
+        mvc.perform(post("/wallets/{id}/movements", "1")
+              .content("{\"amount\" : \"-1\", \"type\" : \"CHARGE\"}")
               .contentType("application/json"))
            .andDo(print())
            .andExpect(status().isBadRequest());
@@ -74,8 +74,8 @@ public class WalletControllerIT {
 
     @Test
     public void charge_notExistingWalletId_404() throws Exception {
-        mvc.perform(post("/wallets/{id}/charges", "2")
-              .content("{\"amount\" : \"10\"}")
+        mvc.perform(post("/wallets/{id}/movements", "2")
+              .content("{\"amount\" : \"10\", \"type\" : \"CHARGE\"}")
               .contentType("application/json"))
            .andDo(print())
            .andExpect(status().isNotFound());
@@ -83,8 +83,8 @@ public class WalletControllerIT {
 
     @Test
     public void recharge_200() throws Exception {
-        mvc.perform(post("/wallets/{id}/recharges", "1")
-              .content("{\"amount\" : \"10\"}")
+        mvc.perform(post("/wallets/{id}/movements", "1")
+              .content("{\"amount\" : \"10\", \"type\" : \"CHARGE\"}")
               .contentType("application/json"))
            .andDo(print())
            .andExpect(status().isOk());
@@ -92,8 +92,8 @@ public class WalletControllerIT {
 
     @Test
     public void recharge_negativeAmount_400() throws Exception {
-        mvc.perform(post("/wallets/{id}/recharges", "1")
-              .content("{\"amount\" : \"-1\"}")
+        mvc.perform(post("/wallets/{id}/movements", "1")
+              .content("{\"amount\" : \"-1\", \"type\" : \"CHARGE\"}")
               .contentType("application/json"))
            .andDo(print())
            .andExpect(status().isBadRequest());
@@ -101,8 +101,8 @@ public class WalletControllerIT {
 
     @Test
     public void recharge_notExistingWalletId_404() throws Exception {
-        mvc.perform(post("/wallets/{id}/recharges", "2")
-              .content("{\"amount\" : \"10\"}")
+        mvc.perform(post("/wallets/{id}/movements", "2")
+              .content("{\"amount\" : \"10\", \"type\" : \"CHARGE\"}")
               .contentType("application/json"))
            .andDo(print())
            .andExpect(status().isNotFound());
@@ -110,8 +110,8 @@ public class WalletControllerIT {
 
     @Test
     public void recharge_smallerThreshold_500() throws Exception {
-        mvc.perform(post("/wallets/{id}/recharges", "1")
-              .content("{\"amount\" : \"9\"}")
+        mvc.perform(post("/wallets/{id}/movements", "1")
+              .content("{\"amount\" : \"9\", \"type\" : \"RECHARGE\"}")
               .contentType("application/json"))
            .andDo(print())
            .andExpect(status().is5xxServerError());
